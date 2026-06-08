@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.10",
+    "@heroicons/react": "^2.2.0",
+    "daisyui": "^5.5.23",
     "next": "16.2.7",
     "react": "19.2.4",
     "react-dom": "19.2.4"
