@@ -1,26 +1,24 @@
 "use client";
 
-import { login as apiLogin, listReviews, type ReviewResponse } from "@/lib/api";
+import { listReviews, type ReviewResponse } from "@/lib/api";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function DashboardPage() {
   const [reviews, setReviews] = useState<ReviewResponse[]>([]);
-  const [authReady, setAuthReady] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiLogin("admin", "admin")
-      .then(() => setAuthReady(true))
-      .then(() => listReviews(1, 100))
+    listReviews(1, 100)
       .then((res) => setReviews(res.data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
-  const total = reviews.length;
-  const matched = reviews.filter((r) => r.can_match).length;
-  const highRisk = reviews.filter(
+  const safe = reviews ?? [];
+  const total = safe.length;
+  const matched = safe.filter((r) => r.can_match).length;
+  const highRisk = safe.filter(
     (r) => r.ai_risk_level === "高" || r.ai_risk_level === "极高" || r.ai_risk_level === "D"
   ).length;
 
@@ -56,9 +54,6 @@ export default function DashboardPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-800">📊 数据看板</h2>
-        {!authReady && (
-          <span className="badge badge-warning">未连接到服务器</span>
-        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -72,7 +67,7 @@ export default function DashboardPage() {
 
       <div className="bg-white rounded-xl p-6 shadow-sm">
         <h3 className="text-base font-semibold text-gray-700 mb-4">最近提交</h3>
-        {reviews.length === 0 ? (
+        {safe.length === 0 ? (
           <p className="text-sm text-gray-400 py-4 text-center">
             暂无审查数据，请先在 Mobile 端提交审查报告
           </p>
@@ -90,7 +85,7 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {reviews.slice(0, 5).map((r) => (
+                  {safe.slice(0, 5).map((r) => (
                   <tr key={r.id} className="text-sm">
                     <td className="font-medium">{r.customer_name}</td>
                     <td><span className={statusBadge(r.credit_status)}>{r.credit_status}</span></td>

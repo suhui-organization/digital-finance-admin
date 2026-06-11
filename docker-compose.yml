@@ -1,0 +1,33 @@
+# =============================================================================
+# digital-finance-admin 独立部署文件
+# 镜像来源: SWR (华为云容器镜像服务)
+# 依赖: go-backend + ai-service 已就绪 (通过 external network 通信)
+# =============================================================================
+version: "3.8"
+
+services:
+  admin:
+    image: swr.ap-southeast-3.myhuaweicloud.com/digital-finance-commercial/admin:${TAG:-latest}
+    container_name: df-admin
+    restart: unless-stopped
+    ports:
+      - "${ADMIN_PORT:-16010}:16010"
+    environment:
+      NODE_ENV: production
+      PORT: "16010"
+      HOSTNAME: "0.0.0.0"
+      # NOT SET: 为空则浏览器使用相对路径 /api/...，经 Nginx Gateway (port 16000) 反向代理到 go-backend:16080
+      # 如需覆盖，设置 NEXT_PUBLIC_API_BASE_URL=http://nginx:80（Docker 内部）或完整外部 URL
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-}
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - df-network
+
+networks:
+  df-network:
+    name: digital-finance-network
+    external: true
