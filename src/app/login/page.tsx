@@ -27,11 +27,14 @@ export default function LoginPage() {
       router.push("/dashboard");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "登录失败";
-      // Generic message — don't reveal whether user exists (DESIGN_DOC 28.1 item 1)
-      if (msg.includes("AUTH_INVALID_CREDENTIALS") || msg.includes("AUTH_FORBIDDEN")) {
-        setError("账号或密码错误");
+      if (msg.includes("AUTH_USER_NOT_FOUND")) {
+        setError("用户不存在，请检查账号是否正确");
+      } else if (msg.includes("AUTH_INVALID_CREDENTIALS")) {
+        setError("密码错误，请重新输入");
       } else if (msg.includes("AUTH_ACCOUNT_DISABLED")) {
         setError("账号已被禁用，请联系管理员");
+      } else if (msg.includes("AUTH_FORBIDDEN")) {
+        setError("无权登录该系统，请检查账号角色");
       } else {
         setError("登录失败，请稍后重试");
       }

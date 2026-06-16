@@ -126,16 +126,24 @@ async function apiFetch<T>(
     ...(options.headers as Record<string, string> || {}),
   };
 
+  const isLoginRequest = path === '/api/v1/auth/login';
+
+  if (isLoginRequest) {
+    clearTokens();
+    clearCachedUser();
+  }
+
   let token = getAccessToken();
 
-  // Auto-refresh if token expired
-  if (!token || Date.now() >= tokenExpiresAt) {
-    const refreshed = await tryRefreshToken();
-    if (refreshed) {
-      token = getAccessToken();
-    } else {
-      clearTokens();
-      clearCachedUser();
+  if (!isLoginRequest) {
+    if (!token || Date.now() >= tokenExpiresAt) {
+      const refreshed = await tryRefreshToken();
+      if (refreshed) {
+        token = getAccessToken();
+      } else {
+        clearTokens();
+        clearCachedUser();
+      }
     }
   }
 
@@ -145,8 +153,7 @@ async function apiFetch<T>(
 
   const res = await fetch(url, { ...options, headers });
 
-  // If 401, try refresh once and retry
-  if (res.status === 401 && getRefreshToken()) {
+  if (!isLoginRequest && res.status === 401 && getRefreshToken()) {
     const refreshed = await tryRefreshToken();
     if (refreshed) {
       headers['Authorization'] = `Bearer ${getAccessToken()}`;
