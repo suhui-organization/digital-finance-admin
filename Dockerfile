@@ -10,6 +10,11 @@ RUN yarn install --frozen-lockfile
 
 COPY . .
 
+# 生产构建: NEXT_PUBLIC_API_BASE_URL 必须为空
+# 空值 → 浏览器使用相对路径 → Next.js 服务端代理转发到 Nginx Gateway
+# 🔴 绝不可设为 localhost / 具体 IP（会写死到客户端 JS bundle）
+ENV NEXT_PUBLIC_API_BASE_URL=""
+
 # Enable standalone output for minimal production image
 RUN yarn build
 
