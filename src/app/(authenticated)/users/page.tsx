@@ -79,7 +79,6 @@ export default function UsersPage() {
     return () => {
       ignore = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, keyword, roleFilter, statusFilter]);
 
   // Refetch helper for event handlers (create/edit/status-toggle)

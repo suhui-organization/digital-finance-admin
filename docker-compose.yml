@@ -16,9 +16,9 @@ services:
       NODE_ENV: production
       PORT: "16010"
       HOSTNAME: "0.0.0.0"
-      # NOT SET: 为空则浏览器使用相对路径 /api/...，经 Nginx Gateway (port 16000) 反向代理到 go-backend:16080
-      # 如需覆盖，设置 NEXT_PUBLIC_API_BASE_URL=http://nginx:80（Docker 内部）或完整外部 URL
-      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-}
+      # 通过 Nginx Gateway 统一访问后端 API（服务端 rewrites 使用）
+      # NEXT_PUBLIC_API_BASE_URL 在 Dockerfile 构建时已 baked 为空字符串，禁止运行时覆盖
+      API_GATEWAY_URL: "http://nginx:80"
     logging:
       driver: json-file
       options:

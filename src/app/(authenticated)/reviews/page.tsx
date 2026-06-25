@@ -47,7 +47,6 @@ export default function ReviewsPage() {
     return () => {
       ignore = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // local filters
